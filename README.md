@@ -2,4 +2,7 @@
 socket.io chat and user authontication with mysql
 
 
-use this user js class https://github.com/allimist/user-mysql
+
+use:
+for socket sessions https://www.npmjs.com/package/socket.io-mysql-session
+this user js class https://github.com/allimist/user-mysql
