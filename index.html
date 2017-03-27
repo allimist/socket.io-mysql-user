@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat + user menagement</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      .form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      .form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      .form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+
+
+      #logout div{display: inline;}
+      hr {margin: 20px 0 0 0;}
+
+    </style>
+  </head>
+  <body>
+  <div>
+
+    <form id="signup" action="">
+      email:<input id="email" name="email" autocomplete="off" value="test" />
+      password:<input id="password" name="password" autocomplete="off" value="123" />
+
+      first_name:<input id="first_name" name="first_name" autocomplete="off" value="socketio" />
+      last_name:<input id="last_name" name="last_name" autocomplete="off" value="user" />
+      phone:<input id="phone" name="phone" autocomplete="off" value="123123123" />
+      type:<input id="type" name="type" autocomplete="off" value="1" />
+      country_code:<input id="country_code" name="country_code" autocomplete="off" value="IL" />
+      state_code:<input id="state_code" name="state_code" autocomplete="off" value="" />
+      address:<input id="address" name="address" autocomplete="off" value="ttt tt 22" />
+
+      <button>Signup</button>
+      <hr>
+    </form>
+
+    
+
+    <form id="login" action="">
+      email:<input id="email" autocomplete="off" value="test4" />
+      password:<input id="password" autocomplete="off" value="123" />
+      <button>Login</button>
+      <hr>
+    </form>
+
+    
+
+    <form id="logout" action="" style="display: none;">
+
+      <!-- <div id="user"> -->
+        id:<div id="id"></div>
+        name:<div id="first_name"></div>
+        <div id="last_name"></div>
+      <!-- </div> -->
+      
+      <button>Logout</button>
+
+      <hr>
+
+    </form>
+
+
+  </div>
+    <ul id="messages"></ul>
+    <form action="" class="form" id="form">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        
+        var socket = io();
+
+        var user_details = null;
+        
+        $('#form').submit(function(){
+
+          if(user_details!=null){
+            msg = user_details.first_name+': '+$('#m').val();
+          } else {
+            msg = 'Guest: '+$('#m').val();
+          }
+          socket.emit('chat message', msg);
+          $('#m').val('');
+          return false;
+        });
+
+        $('#login').submit(function(){
+          login_fields = {email:$('#login #email').val(),password:$('#login #password').val()};
+          socket.emit('user:login', login_fields);
+          
+          return false;
+        });
+
+        $('#logout').submit(function(){
+          login_fields = {command:'logout',id:$('#id').val()};
+          socket.emit('user:securedEvent', login_fields);
+          
+          return false;
+        });
+
+        $('#signup').submit(function(){
+          //signup_fields_temp = $('#signup').serializeArray();
+          //signup_fields={};
+          // $.each(signup_fields_temp, function(i, field){
+          //   signup_fields[field.name] = field.value;
+          // });
+          signup_fields = {email:$('#signup #email').val(),password:$('#signup #password').val(),first_name:$('#signup #first_name').val(),last_name:$('#signup #last_name').val(),phone:$('#signup #phone').val(),type:$('#signup #type').val(),country_code:$('#signup #country_code').val(),state_code:$('#signup #state_code').val(),address:$('#signup #address').val()};
+          //console.log(signup_fields);
+          socket.emit('user:signup', signup_fields);
+          
+          return false;
+        });
+
+
+
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+
+
+
+        // var socket = io("http://your.server.here"),
+        var token = localStorage.getItem("token") || "";
+
+        socket.emit("getToken", {token: localStorage.getItem("token") || ""});
+
+        socket.on("gotToken", function(message){
+            console.log(message);
+            if(message.token != "") {
+                localStorage.setItem("token", message.token);
+                token = message.token;
+            }
+        });
+
+        socket.on('user:login', function(msg){
+          //$('#messages').append($('<li>').text(msg));
+          
+
+          if(msg != "") {
+
+                user_details = msg;
+
+                $('#logout #id').text(msg.id);
+                $('#logout #first_name').text(msg.first_name);
+                $('#logout #last_name').text(msg.last_name);
+                $('#login').hide();
+                $('#signup').hide();
+                $('#logout').show();
+
+            }
+
+        });
+
+        socket.on('user:securedEvent', function(msg){
+          //$('#messages').append($('<li>').text(msg));
+          
+          if(msg != "") {
+                
+                switch(msg.command) {
+                case 'logout':
+                    user_details = null;
+                    $('#logout').hide();
+                    $('#signup').show();
+                    $('#login').show();
+
+                    break;
+                case 'n':
+                    //code block
+                    break;
+                default:
+                    //code block
+                    //socket.emit('user:securedEvent',params);
+                    //socket.emit('chat message','unknown command: '+arams.command);
+
+            }
+          }
+
+
+        });
+
+
+
+      });
+
+    </script>
+
+
+  </body>
+</html>
