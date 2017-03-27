@@ -16,7 +16,7 @@ var socketSession = require("socket.io-mysql-session");
 var Logger = require("filelogger");                  //filelogger is not required, but supported by the middleware
 var logger = new Logger("error", "info", "my.log");
 
-var User = require("./user.js");    
+var User = require("user-mysql");    
 
 
 
