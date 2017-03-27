@@ -1,0 +1,13 @@
+{
+  "name": "socket.io-mysql-user",
+  "version": "1.0.0",
+  "description": "socket.io chat and user authontication",
+  "dependencies": {
+  	"socket.io-mysql-session": "1.0.9",
+    "express": "^4.15.2",
+    "socket.io": "^1.7.3",
+    "mysql":"^2.13.0",
+    "filelogger":"1.0.3",
+    "user-mysql":"^1.0.1"
+  }
+}
